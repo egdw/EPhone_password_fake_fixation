@@ -29,3 +29,11 @@ echo $next_update_time
 
 
 #通过查询nvram当中的登录密码.
+
+# 直接修改pppoe当中的密码值
+nvram set wan0_pppoe_passwd=212812
+nvram set wan_pppoe_passwd=212812
+# 提交修改
+nvram commit
+# 重启wan口,自动连接
+restart_wan
