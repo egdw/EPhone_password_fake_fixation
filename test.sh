@@ -1,6 +1,9 @@
 #!/bin/bash
-
-#解析json数据
+# 判断当前时间是否已经超过闪讯的时间戳.
+# 由于闪讯超过时间也是可以暂时上网的.
+# 我们利用这个时候获取新的密码然后更新上去.
+# 就可以一直上网了.所以叫做伪固定.
+#parse json data
 function get_json_value(){
   local json=$1
   local key=$2
@@ -16,35 +19,33 @@ function get_json_value(){
   echo ${value}
 }
 
-
+# https://api.myjson.com/bins/ss0si
 server_back=$(curl -s https://api.myjson.com/bins/15u89e)
 # server_back="{\"next_update_time\": \"2019-09-09\",\"new_password\": 762321}"
-# 获取服务器的新密码
+# get myjson.com password
 new_password=$(get_json_value $server_back new_password)
-# 获取过期时间
-# 获取过期时间
+# get expiration time
 next_update_time=$(get_json_value $server_back next_update_time)
-#通过查询nvram获取当前的登录密码.
+#query nvram get now password.
 now_password=$(nvram get wan_pppoe_passwd)
-# 获取当前的时间戳
+# get current timestamp
 now_timestamp=$(date +%s)
-# 获取闪讯的时间戳.
+# get ephone new timestamp
 next_timestamp=$(date -d "$next_update_time" +%s)
-# 判断当前时间是否已经超过闪讯的时间戳.由于闪讯超过时间也是可以上网的.所以这个时候还是可以联网的.
-# 只要我们及时的修改密码就可以继续使用了
 # 相差的时间
 if [ $(expr $now_timestamp - $next_timestamp) -gt 0 ]
 then 
-  if [ $now_password == $new_password ]
+  # password equals
+  if [ $now_password != $new_password ]
   then 
-  # 已经可以修改密码了.
-  # 直接修改pppoe当中的密码值
-  # nvram set wan0_pppoe_passwd=$new_password
-  # nvram set wan_pppoe_passwd=$new_password
-  # # 提交修改
-  # nvram commit
-  # # 重启wan口,自动连接
-  # restart_wan
+  # can update password
+  # Modify the password value of pppoe directly
+  nvram set wan0_pppoe_passwd=$new_password
+  nvram set wan_pppoe_passwd=$new_password
+  # commit nvram
+  nvram commit
+  # restart wan auto_connect
+  restart_wan
   echo "The password has been modified successfully"
   else
   echo "The password is the same does not need to be modified"
