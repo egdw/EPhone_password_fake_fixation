@@ -1,8 +1,4 @@
 #!/bin/bash
-# 判断当前时间是否已经超过闪讯的时间戳.
-# 由于闪讯超过时间也是可以暂时上网的.
-# 我们利用这个时候获取新的密码然后更新上去.
-# 就可以一直上网了.所以叫做伪固定.
 #parse json data
 function get_json_value(){
   local json=$1
