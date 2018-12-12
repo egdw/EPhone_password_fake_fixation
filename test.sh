@@ -1,5 +1,5 @@
 #!/bin/bash
-server_back=$(curl -s http://api.myjson.com/bins/15u89e)
+server_back=$(curl -s http://api.myjson.com/bins/XXXX)
 new_password=${server_back:17:6}
 next_update_time=${server_back:45:19}
 echo $new_password
